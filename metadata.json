@@ -1,0 +1,7 @@
+{
+  "name": "AI Face Stylizer",
+  "description": "A real-time face stylization app using your webcam. Transform your face into pixel art or a Disney-style character with AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
