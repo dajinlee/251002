@@ -2,11 +2,30 @@ import { GoogleGenAI, Modality } from "@google/genai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
+console.log("Environment check:", {
+  hasApiKey: !!API_KEY,
+  apiKeyLength: API_KEY?.length || 0,
+  envKeys: Object.keys(import.meta.env).filter(key => key.includes('GEMINI'))
+});
+
 if (!API_KEY) {
-  console.error("API_KEY environment variable not set.");
+  console.error("❌ VITE_GEMINI_API_KEY environment variable is not set.");
+  console.error("Please set up your API key in Vercel environment variables:");
+  console.error("1. Go to your Vercel project dashboard");
+  console.error("2. Settings → Environment Variables");
+  console.error("3. Add: VITE_GEMINI_API_KEY = your_api_key");
+  console.error("4. Redeploy the application");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+let ai: GoogleGenAI | null = null;
+
+try {
+  if (API_KEY) {
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+  }
+} catch (error) {
+  console.error("Failed to initialize GoogleGenAI:", error);
+}
 
 function dataUrlToInlineData(dataUrl: string): {
   mimeType: string;
@@ -21,6 +40,12 @@ function dataUrlToInlineData(dataUrl: string): {
 export const transformToUSAnimationStyle = async (
   faceDataUrl: string
 ): Promise<string> => {
+  if (!ai) {
+    throw new Error(
+      "❌ AI service is not available. Please check that your VITE_GEMINI_API_KEY environment variable is properly set in Vercel."
+    );
+  }
+
   try {
     const imagePart = {
       inlineData: dataUrlToInlineData(faceDataUrl),

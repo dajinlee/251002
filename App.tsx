@@ -16,6 +16,9 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<ApiStatus>('Idle');
+  
+  // Check if API key is available
+  const hasApiKey = !!import.meta.env.VITE_GEMINI_API_KEY;
 
   const apiCallInProgress = useRef(false);
 
@@ -82,6 +85,28 @@ const App: React.FC = () => {
       <main className="w-full max-w-7xl flex flex-col items-center flex-grow">
         <ModeSelector currentMode={mode} onModeChange={handleModeChange} isLoading={isLoading} />
         
+        {!hasApiKey && (
+          <div className="mt-4 w-full max-w-4xl p-4 bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 rounded-lg">
+            <div className="flex items-center gap-3 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <span className="font-semibold">⚠️ API Key Not Configured</span>
+            </div>
+            <p className="text-sm mb-2">The AI transformation feature requires a Gemini API key to be set up.</p>
+            <div className="text-xs text-yellow-200 bg-yellow-500/10 p-2 rounded border-l-2 border-yellow-500">
+              <p className="font-semibold mb-1">For Vercel deployment:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Go to your Vercel project dashboard</li>
+                <li>Navigate to Settings → Environment Variables</li>
+                <li>Add: <code className="bg-gray-800 px-1 rounded">VITE_GEMINI_API_KEY</code> = your_api_key</li>
+                <li>Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-300 underline">Google AI Studio</a></li>
+                <li>Redeploy the application</li>
+              </ol>
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 w-full max-w-4xl p-3 bg-gray-800 border border-gray-700 rounded-lg text-center flex items-center justify-center gap-3">
             <span className="font-semibold">Gemini API Call Status:</span>
             {apiStatus === 'Idle' && <span className="text-gray-400 font-mono">Idle</span>}
